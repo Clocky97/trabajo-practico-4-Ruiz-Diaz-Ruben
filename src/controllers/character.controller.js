@@ -1,4 +1,4 @@
-import { Character } from "../models/character.model";
+import { Character } from "../models/character.model.js";
 
 export const getCharacter = async (req, res) =>{
     const id = res.params.id();
@@ -21,11 +21,30 @@ export const createCharacters = async (req, res) => {
             msg: "Hay campos  vacíos",
         });
     }
+    if (isNaN(ki)) {
+        return res.json({
+            msg: "El KI ingresado no es válido."
+        });
+    }
+  if (gender !== "male" && gender !== "female") {
+    return res.status(400).json({ msg: "El género debe ser 'male' o 'female'" });
+  }
+
+  try {
+    const existing = await Character.findOne({ where: { name } });
+
+    if (existing) {
+      return res.status(400).json({ msg: "Ese nombre ya está en uso." });
+    }
+
 
     const character = await Character.create(req.body);
 
-    res.status(201).json(product);
-};
+    res.status(201).json(character);
+    } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error al crear personaje" });
+  }};
 
 export const updateCharacters = async (req, res) =>{
     try {
@@ -35,7 +54,7 @@ export const updateCharacters = async (req, res) =>{
         const updatedCharacter = await Character.findByIdAndUpdate(id, updates);
 
         if (!uptdatedCharacter) {
-            return res.status(404).json({msg: "Personaje no encontrado"})
+            return res.status(404).json({msg: "Personaje no encontrado"});
         }
         res.status(200).json(updatedCharacter);
     } catch (error) {
