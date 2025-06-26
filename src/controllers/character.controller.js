@@ -28,9 +28,34 @@ export const createCharacters = async (req, res) => {
 };
 
 export const updateCharacters = async (req, res) =>{
+    try {
+        const {id} = req.params;
+        const updates = req.body;
 
+        const updatedCharacter = await Character.findByIdAndUpdate(id, updates);
+
+        if (!uptdatedCharacter) {
+            return res.status(404).json({msg: "Personaje no encontrado"})
+        }
+        res.status(200).json(updatedCharacter);
+    } catch (error) {
+        res.status(500).json({msg: "Error al actualizar el personaje", error});
+    }
+    
 };
 
 export const deleteCharacters = async (req, res) =>{
+    try {
+        const {id} = req.params;
 
+        const deletedCharacter = await Character.findByIdandDelete(id);
+
+        if (!deletedCharacter) {
+            return res.status(404).json({msg: "Personaje no encontrado"});
+        }
+
+        res.status(200).json({msg: "Personaje eliminado correctamente"});
+    }catch (error){
+        res.status(500).json({msg: "Error al eliminar el personaje", error})
+    }
 };
